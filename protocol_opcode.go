@@ -8,14 +8,14 @@ const (
 	OPCODE_STATUS
 )
 
-func (self OPCODE) String() string {
-	if self == OPCODE_QUERY {
+func (o OPCODE) String() string {
+	if o == OPCODE_QUERY {
 		return "QUERY"
 	}
-	if self == OPCODE_IQUERY {
+	if o == OPCODE_IQUERY {
 		return "IQUERY"
 	}
-	if self == OPCODE_STATUS {
+	if o == OPCODE_STATUS {
 		return "STATUS"
 	}
 	panic("invalid OPCODE value")

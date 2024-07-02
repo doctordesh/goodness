@@ -1,8 +1,12 @@
 package goodness
 
-import "encoding/binary"
+import (
+	"encoding/binary"
+	"fmt"
+	"strings"
+)
 
-type Type int
+type Type uint16
 
 const (
 	TYPE_A     = Type(1)
@@ -21,10 +25,12 @@ const (
 	TYPE_MINFO = Type(14)
 	TYPE_MX    = Type(15)
 	TYPE_TXT   = Type(16)
+	TYPE_AAAA  = Type(28)
+	TYPE_HTTPS = Type(65)
 )
 
-func (self Type) String() string {
-	switch self {
+func (t Type) String() string {
+	switch t {
 	case TYPE_A:
 		return "A"
 	case TYPE_NS:
@@ -57,12 +63,16 @@ func (self Type) String() string {
 		return "MX"
 	case TYPE_TXT:
 		return "TXT"
+	case TYPE_AAAA:
+		return "AAAA"
+	case TYPE_HTTPS:
+		return "HTTPS"
 	}
 
-	panic("invalid value for 'Type'")
+	panic(fmt.Sprintf("invalid value for 'Type': %d", int(t)))
 }
 
-type Class int
+type Class uint16
 
 const (
 	CLASS_IN = Class(1)
@@ -71,8 +81,8 @@ const (
 	CLASS_HS = Class(4)
 )
 
-func (self Class) String() string {
-	switch self {
+func (c Class) String() string {
+	switch c {
 	case CLASS_IN:
 		return "IN"
 	case CLASS_CS:
@@ -89,37 +99,41 @@ type Question struct {
 	Data []byte
 }
 
-func (self Question) NameLabels() []string {
+func (q Question) NameLabels() []string {
 	offset := 0
 	parts := []string{}
 	for {
-		length := int(self.Data[offset])
+		length := int(q.Data[offset])
 		if length == 0 {
 			break
 		}
 
-		parts = append(parts, string(self.Data[offset+1:offset+1+length]))
+		parts = append(parts, string(q.Data[offset+1:offset+1+length]))
 		offset = offset + length + 1
 	}
 	return parts
 }
 
-func (self Question) nameOffset() int {
+func (q Question) nameOffset() int {
 	// Assumption, the first zero byte is the end of the name labels
-	for i := 0; i < len(self.Data); i++ {
-		if self.Data[i] == 0 {
+	for i := 0; i < len(q.Data); i++ {
+		if q.Data[i] == 0 {
 			return i + 1
 		}
 	}
 	panic("Question type needs a zero byte to split the name labels and type + class")
 }
 
-func (self Question) Type() Type {
-	offset := self.nameOffset()
-	return Type(binary.BigEndian.Uint16(self.Data[offset : offset+2]))
+func (q Question) Type() Type {
+	offset := q.nameOffset()
+	return Type(binary.BigEndian.Uint16(q.Data[offset : offset+2]))
 }
 
-func (self Question) Class() Class {
-	offset := self.nameOffset() + 2
-	return Class(binary.BigEndian.Uint16(self.Data[offset : offset+2]))
+func (q Question) Class() Class {
+	offset := q.nameOffset() + 2
+	return Class(binary.BigEndian.Uint16(q.Data[offset : offset+2]))
+}
+
+func (q Question) String() string {
+	return fmt.Sprintf("%T<%s, Type: %s, Class: %s>", q, strings.Join(q.NameLabels(), "."), q.Type(), q.Class())
 }

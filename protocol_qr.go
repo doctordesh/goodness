@@ -7,11 +7,11 @@ const (
 	QR_RESPONSE = QR(1)
 )
 
-func (self QR) String() string {
-	if self == QR_QUERY {
+func (q QR) String() string {
+	if q == QR_QUERY {
 		return "QUERY"
 	}
-	if self == QR_RESPONSE {
+	if q == QR_RESPONSE {
 		return "RESPONSE"
 	}
 	panic("invalid QR value")

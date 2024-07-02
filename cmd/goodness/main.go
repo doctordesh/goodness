@@ -1,9 +1,15 @@
 package main
 
-import "github.com/doctordesh/goodness"
+import (
+	"fmt"
+
+	"github.com/doctordesh/goodness"
+)
 
 func main() {
-	g := goodness.New()
-	// g.Serve()
-	g.Build()
+	g := goodness.New("", 53)
+	err := g.Serve()
+	if err != nil {
+		fmt.Printf("ERROR: %s\n", err)
+	}
 }

@@ -1,0 +1,13 @@
+
+https://datatracker.ietf.org/doc/html/rfc1035#section-4.1.1
+
+
+* TODO Prase all the appendices in order to print the full message
+
+~parse~ function on the message?
+
+~New()~ function that takes the
+
+- [ ] Parse all the Appendixes in order to print a full message (qdcoutn,
+      andcount, nscount, arcount)
+- [ ]
